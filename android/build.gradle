@@ -1,63 +1,29 @@
-group 'com.example.pip_flutter'
-version '1.0-SNAPSHOT'
-
-buildscript {
-    ext.kotlin_version = '1.9.25' // update Kotlin for AGP compatibility
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4' // modern AGP
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-rootProject.allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace "com.example.pip_flutter"   // ✅ required, replaces `package` in manifest
-    compileSdkVersion 34                  // ✅ bump to latest stable
+    namespace "com.example.pip_flutter"
+    compileSdkVersion 34
 
     defaultConfig {
-        minSdkVersion 21                  // AGP 8 requires at least 21
+        minSdkVersion 21
         targetSdkVersion 34
-        multiDexEnabled true
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+    kotlinOptions { jvmTarget = '11' }
+}
 
-    kotlinOptions {
-        jvmTarget = '11'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
+ext {
+    exoPlayerVersion = "2.15.1"   // keep this OLD version to match plugin code
 }
 
 dependencies {
-    // Version constants
-    ext {
-        exoPlayerVersion = "2.15.1"
-        lifecycleVersion = "2.4.0"
-        annotationVersion = "1.2.0"
-        workVersion = "2.7.0"
-        coreVersion = "1.6.0"
-    }
-
-    // ExoPlayer
+    // ExoPlayer — pin every module to the SAME version
     implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exoPlayerVersion"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
@@ -65,17 +31,24 @@ dependencies {
     implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
     implementation "com.google.android.exoplayer:extension-mediasession:$exoPlayerVersion"
 
-    // AndroidX
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-common:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-    implementation "androidx.annotation:annotation:$annotationVersion"
-    implementation "androidx.work:work-runtime:$workVersion"
-    implementation "androidx.core:core-ktx:$coreVersion"
+    // AndroidX media (MediaSessionCompat etc.)
+    implementation "androidx.media:media:1.6.0"
 
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // (Optional) if some transitive lib still refers to legacy v4, satisfy it:
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
 
-    // Multidex
-    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.25"
+}
+
+// Extra safety: force all ExoPlayer modules to 2.15.1
+configurations.all {
+    resolutionStrategy.force(
+        "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}",
+        "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}",
+        "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}",
+        "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}",
+        "com.google.android.exoplayer:exoplayer-ui:${exoPlayerVersion}",
+        "com.google.android.exoplayer:extension-mediasession:${exoPlayerVersion}"
+    )
 }
