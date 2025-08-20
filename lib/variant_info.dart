@@ -41,7 +41,7 @@ class VariantInfo {
   }
 
   @override
-  + int get hashCode => Object.hash(
+   int get hashCode => Object.hash(
    audio,
    caption,
    subtitle,
