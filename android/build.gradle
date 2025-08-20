@@ -2,14 +2,13 @@ group 'com.example.pip_flutter'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.5.20'
+    ext.kotlin_version = '1.9.25' // update Kotlin for AGP compatibility
     repositories {
         google()
         mavenCentral()
     }
-
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:8.1.4' // modern AGP
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -25,53 +24,58 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace "com.example.pip_flutter"   // ✅ required, replaces `package` in manifest
+    compileSdkVersion 34                  // ✅ bump to latest stable
 
-    ext.exoPlayerVersion = "2.15.1"
-    ext.lifecycleVersion = "2.4.0-beta01"
-    ext.annotationVersion = "1.2.0"
-    ext.workVersion = "2.7.0"
-    ext.gradleVersion = "4.1.0"
-    ext.kotlinVersion = "1.5.31"
-
-    compileSdkVersion 31
+    defaultConfig {
+        minSdkVersion 21                  // AGP 8 requires at least 21
+        targetSdkVersion 34
+        multiDexEnabled true
+    }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-
-    defaultConfig {
-        minSdkVersion 16
-        multiDexEnabled true
-    }
-
-    dependencies {
-        implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
-        implementation "com.google.android.exoplayer:exoplayer-hls:$exoPlayerVersion"
-        implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
-        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoPlayerVersion"
-        implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
-        implementation "com.google.android.exoplayer:extension-mediasession:$exoPlayerVersion"
-        implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
-        implementation "androidx.lifecycle:lifecycle-common:$lifecycleVersion"
-        implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-        implementation "androidx.annotation:annotation:$annotationVersion"
-        implementation "androidx.work:work-runtime:$workVersion"
-        implementation 'com.android.support:multidex:1.0.3'
-    }
 }
 
 dependencies {
-    ext.coreVersion = "1.6.0"
+    // Version constants
+    ext {
+        exoPlayerVersion = "2.15.1"
+        lifecycleVersion = "2.4.0"
+        annotationVersion = "1.2.0"
+        workVersion = "2.7.0"
+        coreVersion = "1.6.0"
+    }
 
+    // ExoPlayer
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-hls:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:extension-mediasession:$exoPlayerVersion"
+
+    // AndroidX
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+    implementation "androidx.annotation:annotation:$annotationVersion"
+    implementation "androidx.work:work-runtime:$workVersion"
     implementation "androidx.core:core-ktx:$coreVersion"
+
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Multidex
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
