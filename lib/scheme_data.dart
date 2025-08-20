@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
 class SchemeData {
@@ -11,7 +10,6 @@ class SchemeData {
     this.requiresSecureDecryption,
   });
 
-  // /// The uuid of the DRM scheme, or null if the data is universal (i.e. applies to all schemes).
   // final String uuid;
 
   /// The URL of the server to which license requests should be made. May be null if unknown.
@@ -28,7 +26,6 @@ class SchemeData {
   final bool? requiresSecureDecryption;
 
   SchemeData copyWithData(Uint8List? data) => SchemeData(
-        // uuid: uuid,
         licenseServerUrl: licenseServerUrl,
         mimeType: mimeType,
         data: data,
@@ -37,4 +34,20 @@ class SchemeData {
 
   @override
   bool operator ==(dynamic other) {
-    if (other is SchemeD
+    if (other is SchemeData) {
+      return other.mimeType == mimeType &&
+          other.licenseServerUrl == licenseServerUrl &&
+          other.requiresSecureDecryption == requiresSecureDecryption &&
+          other.data == data;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        licenseServerUrl,
+        mimeType,
+        data,
+        requiresSecureDecryption,
+      );
+}
